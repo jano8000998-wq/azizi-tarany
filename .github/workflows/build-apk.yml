@@ -1,1 +1,41 @@
+name: Build Azizi Tarany APK
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        run: |
+          git clone https://github.com/flutter/flutter.git \
+            --depth 1 \
+            -b stable \
+            $HOME/flutter
+          echo "$HOME/flutter/bin" >> $GITHUB_PATH
+
+      - name: Check Flutter
+        run: flutter --version
+
+      - name: Generate Android project files
+        run: flutter create --platforms=android .
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Azizi-Tarany-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
