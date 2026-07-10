@@ -189,7 +189,7 @@ class _HomePageState extends State<HomePage> {
               clipBehavior: Clip.antiAlias,
               child: Image.asset(
                 'assets/images/cover.png',
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
               ),
             ),
 
