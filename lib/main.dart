@@ -167,25 +167,20 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final items = _filtered;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // COVER PHOTO
-            Container(
-              width: double.infinity,
-              height: 190,
-              margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 12,
-                    offset: Offset(0, 5),
-                    color: Colors.black26,
-                  ),
-                ],
-              ),
+    rreturn Scaffold(
+  body: Container(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFF0B3D2E),
+          Color(0xFF145A46),
+          Color(0xFF081F19),
+        ],
+      ),
+    ),
+    child: SafeArea(
               clipBehavior: Clip.antiAlias,
               child: Image.asset(
                 'assets/images/cover.png',
