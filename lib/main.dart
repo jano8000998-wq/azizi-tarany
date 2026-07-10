@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-void main() => runApp(const AziziTaranyApp());
+void main() {
+  runApp(const AziziTaranyApp());
+}
 
 class Tarana {
   const Tarana({
@@ -16,7 +18,7 @@ class Tarana {
 const String _baseUrl =
     'https://raw.githubusercontent.com/jano8000998-wq/azizi-tarany/main/assets/audio';
 
-const tarany = <Tarana>[
+const List<Tarana> tarany = [
   Tarana(
     title: 'آخر مي درنه تاؤ کړله لاسونه شهادته',
     url: '$_baseUrl/01.mp3',
@@ -69,8 +71,9 @@ class AziziTaranyApp extends StatelessWidget {
       title: 'Azizi Tarany',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F5B46),
+          seedColor: const Color(0xFF0B4A3A),
         ),
+        scaffoldBackgroundColor: const Color(0xFFF5F7F6),
         useMaterial3: true,
       ),
       home: const HomePage(),
@@ -123,15 +126,16 @@ class _HomePageState extends State<HomePage> {
 
       await _player.setUrl(tarany[index].url);
       await _player.play();
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'آډیو ونه چلېده. انټرنېټ وګورئ او بیا هڅه وکړئ.',
+            'آډیو ونه چلېده: $e',
             textDirection: TextDirection.rtl,
           ),
+          duration: const Duration(seconds: 6),
         ),
       );
     } finally {
@@ -164,35 +168,34 @@ class _HomePageState extends State<HomePage> {
     final items = _filtered;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Azizi Tarany',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              'د عزيزي ترانې',
-              style: TextStyle(
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                16,
-                12,
-                16,
-                8,
+            // COVER PHOTO
+            Container(
+              width: double.infinity,
+              height: 190,
+              margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: const [
+                  BoxShadow(
+                    blurRadius: 12,
+                    offset: Offset(0, 5),
+                    color: Colors.black26,
+                  ),
+                ],
               ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.asset(
+                'assets/images/cover.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            // SEARCH BAR
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
               child: TextField(
                 textDirection: TextDirection.rtl,
                 onChanged: (value) {
@@ -202,18 +205,19 @@ class _HomePageState extends State<HomePage> {
                 },
                 decoration: InputDecoration(
                   hintText: 'ترانه ولټوئ...',
-                  prefixIcon: const Icon(
-                    Icons.search,
-                  ),
+                  hintTextDirection: TextDirection.rtl,
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      18,
-                    ),
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
             ),
 
+            // TARANY LIST
             Expanded(
               child: items.isEmpty
                   ? const Center(
@@ -223,70 +227,76 @@ class _HomePageState extends State<HomePage> {
                       ),
                     )
                   : ListView.separated(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
                       itemCount: items.length,
                       separatorBuilder: (_, __) {
-                        return const SizedBox(
-                          height: 6,
-                        );
+                        return const SizedBox(height: 6);
                       },
                       itemBuilder: (context, i) {
                         final entry = items[i];
                         final index = entry.key;
                         final item = entry.value;
-                        final active =
-                            _currentIndex == index;
+                        final active = _currentIndex == index;
 
                         return Card(
+                          elevation: active ? 4 : 1,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
                             leading: CircleAvatar(
-                              child: Text(
-                                '${index + 1}',
-                              ),
+                              backgroundColor: active
+                                  ? const Color(0xFF0B4A3A)
+                                  : const Color(0xFFE2ECE8),
+                              foregroundColor:
+                                  active ? Colors.white : Colors.black87,
+                              child: Text('${index + 1}'),
                             ),
                             title: Text(
                               item.title,
-                              textDirection:
-                                  TextDirection.rtl,
+                              textDirection: TextDirection.rtl,
+                              style: TextStyle(
+                                fontWeight: active
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
                             ),
                             subtitle: const Text(
                               'آنلاین آډیو',
-                              textDirection:
-                                  TextDirection.rtl,
+                              textDirection: TextDirection.rtl,
                             ),
-                            trailing:
-                                active && _loading
-                                    ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child:
-                                            CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : StreamBuilder<bool>(
-                                        stream:
-                                            _player.playingStream,
-                                        builder:
-                                            (context, snapshot) {
-                                          final playing =
-                                              active &&
-                                                  (snapshot.data ??
-                                                      false);
+                            trailing: active && _loading
+                                ? const SizedBox(
+                                    width: 26,
+                                    height: 26,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : StreamBuilder<bool>(
+                                    stream: _player.playingStream,
+                                    builder: (context, snapshot) {
+                                      final playing =
+                                          active && (snapshot.data ?? false);
 
-                                          return IconButton(
-                                            onPressed: () {
-                                              _play(index);
-                                            },
-                                            icon: Icon(
-                                              playing
-                                                  ? Icons.pause_circle
-                                                  : Icons.play_circle,
-                                            ),
-                                            iconSize: 36,
-                                          );
+                                      return IconButton(
+                                        onPressed: () {
+                                          _play(index);
                                         },
-                                      ),
+                                        icon: Icon(
+                                          playing
+                                              ? Icons.pause_circle_filled
+                                              : Icons.play_circle_fill,
+                                        ),
+                                        color: const Color(0xFF0B4A3A),
+                                        iconSize: 38,
+                                      );
+                                    },
+                                  ),
                             onTap: () {
                               _play(index);
                             },
@@ -296,84 +306,59 @@ class _HomePageState extends State<HomePage> {
                     ),
             ),
 
+            // BOTTOM PLAYER
             if (_currentIndex != null)
               StreamBuilder<Duration>(
                 stream: _player.positionStream,
                 builder: (context, posSnap) {
-                  final position =
-                      posSnap.data ?? Duration.zero;
+                  final position = posSnap.data ?? Duration.zero;
+                  final duration = _player.duration ?? Duration.zero;
 
-                  final duration =
-                      _player.duration ?? Duration.zero;
+                  final maxMs = duration.inMilliseconds > 0
+                      ? duration.inMilliseconds.toDouble()
+                      : 1.0;
 
-                  final maxMs =
-                      duration.inMilliseconds > 0
-                          ? duration.inMilliseconds
-                              .toDouble()
-                          : 1.0;
-
-                  final value =
-                      position.inMilliseconds
-                          .clamp(
-                            0,
-                            maxMs.toInt(),
-                          )
-                          .toDouble();
+                  final value = position.inMilliseconds
+                      .clamp(0, maxMs.toInt())
+                      .toDouble();
 
                   return Material(
-                    elevation: 8,
+                    elevation: 12,
+                    color: Colors.white,
                     child: Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(
-                        16,
-                        8,
-                        16,
-                        12,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            tarany[_currentIndex!]
-                                .title,
-                            textDirection:
-                                TextDirection.rtl,
+                            tarany[_currentIndex!].title,
+                            textDirection: TextDirection.rtl,
                             maxLines: 1,
-                            overflow:
-                                TextOverflow.ellipsis,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-
                           Slider(
                             min: 0,
                             max: maxMs,
                             value: value,
-                            onChanged:
-                                duration.inMilliseconds <= 0
-                                    ? null
-                                    : (v) {
-                                        _player.seek(
-                                          Duration(
-                                            milliseconds:
-                                                v.round(),
-                                          ),
-                                        );
-                                      },
+                            onChanged: duration.inMilliseconds <= 0
+                                ? null
+                                : (v) {
+                                    _player.seek(
+                                      Duration(
+                                        milliseconds: v.round(),
+                                      ),
+                                    );
+                                  },
                           ),
-
                           Row(
                             mainAxisAlignment:
-                                MainAxisAlignment
-                                    .spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                _formatDuration(
-                                  position,
-                                ),
-                              ),
-                              Text(
-                                _formatDuration(
-                                  duration,
-                                ),
-                              ),
+                              Text(_formatDuration(position)),
+                              Text(_formatDuration(duration)),
                             ],
                           ),
                         ],
