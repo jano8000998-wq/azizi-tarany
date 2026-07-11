@@ -33,52 +33,29 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          manifest = Path(
-              "android/app/src/main/AndroidManifest.xml"
-          )
-
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
           text = manifest.read_text(encoding="utf-8")
 
-          permission = (
-              '<uses-permission '
-              'android:name="android.permission.INTERNET" />'
-          )
+          permission = '<uses-permission android:name="android.permission.INTERNET" />'
 
           if permission not in text:
-              text = text.replace(
-                  "<manifest",
-                  "<manifest",
-                  1
-              )
-
               first_close = text.find(">")
+              text = text[:first_close + 1] + "\n    " + permission + text[first_close + 1:]
 
-              text = (
-                  text[:first_close + 1]
-                  + "\n    "
-                  + permission
-                  + text[first_close + 1:]
-              )
+          manifest.write_text(text, encoding="utf-8")
 
-          manifest.write_text(
-              text,
-              encoding="utf-8",
-          )
-
-          final_text = manifest.read_text(
-              encoding="utf-8"
-          )
-
+          final_text = manifest.read_text(encoding="utf-8")
           print(final_text)
 
           if permission not in final_text:
-              raise RuntimeError(
-                  "INTERNET permission missing"
-              )
+              raise RuntimeError("INTERNET permission missing")
           PY
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Generate launcher icon
+        run: dart run flutter_launcher_icons
 
       - name: Build APK
         run: flutter build apk --release
@@ -88,5 +65,3 @@ jobs:
         with:
           name: Azizi-Tarany-APK
           path: build/app/outputs/flutter-apk/app-release.apk
-
-    
