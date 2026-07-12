@@ -278,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           _SocialButton(
                             label: 'Facebook',
-                            icon: FontAwesomeIcons.facebook,
+                            Icons.facebook_rounded
                             color: const Color(0xFF1877F2),
                             onTap: () => _openLink(
                               'https://www.facebook.com/profile.php?id=61591626821493&mibextid=ZbWKwL',
