@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() {
   runApp(const AziziTaranyApp());
@@ -263,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           _SocialButton(
                             label: 'Telegram',
-                            icon: FontAwesomeIcons.telegram,
+                            icon: Icons.send_rounded,
                             color: const Color(0xFF229ED9),
                             onTap: () => _openLink(
                               'https://t.me/azizi_998',
@@ -271,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           _SocialButton(
                             label: 'YouTube',
-                            icon: FontAwesomeIcons.youtube,
+                            icon: Icons.play_circle_fill_rounded,
                             color: const Color(0xFFFF0000),
                             onTap: () => _openLink(
                               'https://www.youtube.com/@islamic.visions.ai998',
