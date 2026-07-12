@@ -170,7 +170,6 @@ class _HomePageState extends State<HomePage> {
   String _formatDuration(Duration value) {
     final minutes =
         value.inMinutes.remainder(60).toString().padLeft(2, '0');
-
     final seconds =
         value.inSeconds.remainder(60).toString().padLeft(2, '0');
 
@@ -260,31 +259,35 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          
-                ),_SocialButton(
-  label: 'Telegram',
-  icon: Icons.send_rounded,
-  color: const Color(0xFF229ED9),
-  onTap: () => _openLink(
-    'https://t.me/azizi_998',
-  ),
-),
-_SocialButton(
-  label: 'YouTube',
-  icon: Icons.play_circle_fill_rounded,
-  color: const Color(0xFFFF0000),
-  onTap: () => _openLink(
-    'https://www.youtube.com/@islamic.visions.ai998',
-  ),
-),
-_SocialButton(
-  label: 'Facebook',
-  icon: Icons.facebook_rounded,
-  color: const Color(0xFF1877F2),
-  onTap: () => _openLink(
-    'https://www.facebook.com/profile.php?id=61591626821493&mibextid=ZbWKwL',
-  ),
-),
+                          _SocialButton(
+                            label: 'Telegram',
+                            icon: Icons.send_rounded,
+                            color: Color(0xFF229ED9),
+                            onTap: () => _openLink(
+                              'https://t.me/azizi_998',
+                            ),
+                          ),
+                          _SocialButton(
+                            label: 'YouTube',
+                            icon: Icons.play_circle_fill_rounded,
+                            color: Color(0xFFFF0000),
+                            onTap: () => _openLink(
+                              'https://www.youtube.com/@islamic.visions.ai998',
+                            ),
+                          ),
+                          _SocialButton(
+                            label: 'Facebook',
+                            icon: Icons.facebook_rounded,
+                            color: Color(0xFF1877F2),
+                            onTap: () => _openLink(
+                              'https://www.facebook.com/profile.php?id=61591626821493&mibextid=ZbWKwL',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
               Padding(
@@ -527,3 +530,4 @@ class _SocialButton extends StatelessWidget {
     );
   }
 }
+    
