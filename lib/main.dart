@@ -510,7 +510,7 @@ class _SocialButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(
+            Icon(
               icon,
               color: color,
               size: 22,
