@@ -91,10 +91,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AudioPlayer _player = AudioPlayer();
+  final FocusNode _searchFocusNode = FocusNode();
 
   String _query = '';
   int? _currentIndex;
   bool _loading = false;
+  DateTime? _lastBackPressed;
 
   List<MapEntry<int, Tarana>> get _filtered {
     final q = _query.trim().toLowerCase();
@@ -176,8 +178,37 @@ class _HomePageState extends State<HomePage> {
     return '$minutes:$seconds';
   }
 
+  Future<bool> _onWillPop() async {
+    if (_searchFocusNode.hasFocus) {
+      _searchFocusNode.unfocus();
+      return false;
+    }
+
+    final now = DateTime.now();
+
+    if (_lastBackPressed == null ||
+        now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
+      _lastBackPressed = now;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'د وتلو لپاره بیا Back ووهئ',
+            textDirection: TextDirection.rtl,
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   void dispose() {
+    _searchFocusNode.dispose();
     _player.dispose();
     super.dispose();
   }
@@ -185,285 +216,310 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final items = _filtered;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0B3D2E),
-              Color(0xFF145A46),
-              Color(0xFF081F19),
-            ],
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF0B3D2E),
+                Color(0xFF145A46),
+                Color(0xFF081F19),
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 210,
-                margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0B4A3A),
-                  borderRadius: BorderRadius.circular(22),
-                  boxShadow: const [
-                    BoxShadow(
-                      blurRadius: 12,
-                      offset: Offset(0, 5),
-                      color: Colors.black26,
-                    ),
-                  ],
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Image.asset(
-                  'assets/images/cover.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.92),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(
-                        blurRadius: 6,
-                        offset: Offset(0, 3),
-                        color: Colors.black12,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'دلته به تاسو ته د مولوي عبدالعزيز عزيزي ترانې ملاوېږي',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0B4A3A),
+          child: SafeArea(
+            child: Column(
+              children: [
+                if (!keyboardOpen)
+                  Container(
+                    width: double.infinity,
+                    height: 210,
+                    margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0B4A3A),
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: const [
+                        BoxShadow(
+                          blurRadius: 12,
+                          offset: Offset(0, 5),
+                          color: Colors.black26,
                         ),
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset(
+                      'assets/images/cover.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                if (!keyboardOpen)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 12,
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _SocialButton(
-                            label: 'Telegram',
-                            icon: Icons.send_rounded,
-                            color: Color(0xFF229ED9),
-                            onTap: () => _openLink(
-                              'https://t.me/azizi_998',
-                            ),
-                          ),
-                          _SocialButton(
-                            label: 'YouTube',
-                            icon: Icons.play_circle_fill_rounded,
-                            color: Color(0xFFFF0000),
-                            onTap: () => _openLink(
-                              'https://www.youtube.com/@islamic.visions.ai998',
-                            ),
-                          ),
-                          _SocialButton(
-                            label: 'Facebook',
-                            icon: Icons.facebook_rounded,
-                            color: Color(0xFF1877F2),
-                            onTap: () => _openLink(
-                              'https://www.facebook.com/profile.php?id=61591626821493&mibextid=ZbWKwL',
-                            ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.92),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                            color: Colors.black12,
                           ),
                         ],
                       ),
-                    ],
+                      child: Column(
+                        children: [
+                          const Text(
+                            'دلته به تاسو ته د مولوي عبدالعزيز عزيزي ترانې ملاوېږي',
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF0B4A3A),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _SocialButton(
+                                label: 'Telegram',
+                                icon: Icons.send_rounded,
+                                color: Color(0xFF229ED9),
+                                onTap: () => _openLink(
+                                  'https://t.me/azizi_998',
+                                ),
+                              ),
+                              _SocialButton(
+                                label: 'YouTube',
+                                icon: Icons.play_circle_fill_rounded,
+                                color: Color(0xFFFF0000),
+                                onTap: () => _openLink(
+                                  'https://www.youtube.com/@islamic.visions.ai998',
+                                ),
+                              ),
+                              _SocialButton(
+                                label: 'Facebook',
+                                icon: Icons.facebook_rounded,
+                                color: Color(0xFF1877F2),
+                                onTap: () => _openLink(
+                                  'https://www.facebook.com/profile.php?id=61591626821493&mibextid=ZbWKwL',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
-                child: TextField(
-                  textDirection: TextDirection.rtl,
-                  onChanged: (value) {
-                    setState(() {
-                      _query = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'ترانه ولټوئ...',
-                    hintTextDirection: TextDirection.rtl,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: BorderSide.none,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
+                  child: TextField(
+                    focusNode: _searchFocusNode,
+                    textDirection: TextDirection.rtl,
+                    onChanged: (value) {
+                      setState(() {
+                        _query = value;
+                      });
+                    },
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'ترانه ولټوئ...',
+                      hintTextDirection: TextDirection.rtl,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _query.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                setState(() {
+                                  _query = '';
+                                });
+                                _searchFocusNode.unfocus();
+                              },
+                            ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              Expanded(
-                child: items.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'کومه ترانه ونه موندل شوه',
-                          textDirection: TextDirection.rtl,
-                          style: TextStyle(color: Colors.white),
+                Expanded(
+                  child: items.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'کومه ترانه ونه موندل شوه',
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      : ListView.separated(
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+                          itemCount: items.length,
+                          separatorBuilder: (_, __) {
+                            return const SizedBox(height: 6);
+                          },
+                          itemBuilder: (context, i) {
+                            final entry = items[i];
+                            final index = entry.key;
+                            final item = entry.value;
+                            final active = _currentIndex == index;
+
+                            return Card(
+                              color: Colors.white.withOpacity(0.92),
+                              elevation: active ? 4 : 1,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                leading: CircleAvatar(
+                                  backgroundColor: active
+                                      ? const Color(0xFF0B4A3A)
+                                      : const Color(0xFFE2ECE8),
+                                  foregroundColor:
+                                      active ? Colors.white : Colors.black87,
+                                  child: Text('${index + 1}'),
+                                ),
+                                title: Text(
+                                  item.title,
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(
+                                    fontWeight: active
+                                        ? FontWeight.bold
+                                        : FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: const Text(
+                                  'آنلاین آډیو',
+                                  textDirection: TextDirection.rtl,
+                                ),
+                                trailing: active && _loading
+                                    ? const SizedBox(
+                                        width: 26,
+                                        height: 26,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                        ),
+                                      )
+                                    : StreamBuilder<bool>(
+                                        stream: _player.playingStream,
+                                        builder: (context, snapshot) {
+                                          final playing =
+                                              active && (snapshot.data ?? false);
+
+                                          return IconButton(
+                                            onPressed: () {
+                                              _play(index);
+                                            },
+                                            icon: Icon(
+                                              playing
+                                                  ? Icons.pause_circle_filled
+                                                  : Icons.play_circle_fill,
+                                            ),
+                                            color: const Color(0xFF0B4A3A),
+                                            iconSize: 38,
+                                          );
+                                        },
+                                      ),
+                                onTap: () {
+                                  _play(index);
+                                },
+                              ),
+                            );
+                          },
                         ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-                        itemCount: items.length,
-                        separatorBuilder: (_, __) {
-                          return const SizedBox(height: 6);
-                        },
-                        itemBuilder: (context, i) {
-                          final entry = items[i];
-                          final index = entry.key;
-                          final item = entry.value;
-                          final active = _currentIndex == index;
+                ),
 
-                          return Card(
-                            color: Colors.white.withOpacity(0.92),
-                            elevation: active ? 4 : 1,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
-                              leading: CircleAvatar(
-                                backgroundColor: active
-                                    ? const Color(0xFF0B4A3A)
-                                    : const Color(0xFFE2ECE8),
-                                foregroundColor:
-                                    active ? Colors.white : Colors.black87,
-                                child: Text('${index + 1}'),
-                              ),
-                              title: Text(
-                                item.title,
+                if (_currentIndex != null)
+                  StreamBuilder<Duration>(
+                    stream: _player.positionStream,
+                    builder: (context, posSnap) {
+                      final position = posSnap.data ?? Duration.zero;
+                      final duration = _player.duration ?? Duration.zero;
+
+                      final maxMs = duration.inMilliseconds > 0
+                          ? duration.inMilliseconds.toDouble()
+                          : 1.0;
+
+                      final value = position.inMilliseconds
+                          .clamp(0, maxMs.toInt())
+                          .toDouble();
+
+                      return Material(
+                        elevation: 12,
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                tarany[_currentIndex!].title,
                                 textDirection: TextDirection.rtl,
-                                style: TextStyle(
-                                  fontWeight: active
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              subtitle: const Text(
-                                'آنلاین آډیو',
-                                textDirection: TextDirection.rtl,
-                              ),
-                              trailing: active && _loading
-                                  ? const SizedBox(
-                                      width: 26,
-                                      height: 26,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                      ),
-                                    )
-                                  : StreamBuilder<bool>(
-                                      stream: _player.playingStream,
-                                      builder: (context, snapshot) {
-                                        final playing =
-                                            active && (snapshot.data ?? false);
-
-                                        return IconButton(
-                                          onPressed: () {
-                                            _play(index);
-                                          },
-                                          icon: Icon(
-                                            playing
-                                                ? Icons.pause_circle_filled
-                                                : Icons.play_circle_fill,
+                              Slider(
+                                min: 0,
+                                max: maxMs,
+                                value: value,
+                                onChanged: duration.inMilliseconds <= 0
+                                    ? null
+                                    : (v) {
+                                        _player.seek(
+                                          Duration(
+                                            milliseconds: v.round(),
                                           ),
-                                          color: const Color(0xFF0B4A3A),
-                                          iconSize: 38,
                                         );
                                       },
-                                    ),
-                              onTap: () {
-                                _play(index);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-              ),
-
-              if (_currentIndex != null)
-                StreamBuilder<Duration>(
-                  stream: _player.positionStream,
-                  builder: (context, posSnap) {
-                    final position = posSnap.data ?? Duration.zero;
-                    final duration = _player.duration ?? Duration.zero;
-
-                    final maxMs = duration.inMilliseconds > 0
-                        ? duration.inMilliseconds.toDouble()
-                        : 1.0;
-
-                    final value = position.inMilliseconds
-                        .clamp(0, maxMs.toInt())
-                        .toDouble();
-
-                    return Material(
-                      elevation: 12,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              tarany[_currentIndex!].title,
-                              textDirection: TextDirection.rtl,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                            Slider(
-                              min: 0,
-                              max: maxMs,
-                              value: value,
-                              onChanged: duration.inMilliseconds <= 0
-                                  ? null
-                                  : (v) {
-                                      _player.seek(
-                                        Duration(
-                                          milliseconds: v.round(),
-                                        ),
-                                      );
-                                    },
-                            ),
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(_formatDuration(position)),
-                                Text(_formatDuration(duration)),
-                              ],
-                            ),
-                          ],
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(_formatDuration(position)),
+                                  Text(_formatDuration(duration)),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-            ],
+                      );
+                    },
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -530,4 +586,3 @@ class _SocialButton extends StatelessWidget {
     );
   }
 }
-    
