@@ -656,7 +656,7 @@ class _FolderPageState extends State<FolderPage> {
   }
 }
 
-class _FoldersGrid extends StatelessWidget {
+}class _FoldersGrid extends StatelessWidget {
   const _FoldersGrid({
     required this.onFolderTap,
   });
@@ -680,78 +680,98 @@ class _FoldersGrid extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior.onDrag,
-            itemCount: folders.length,
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 1.18,
-            ),
-            itemBuilder: (context, index) {
-              final folder = folders[index];
-              final count =
-                  tarany.where((item) => item.letter == folder.letter).length;
 
-              return InkWell(
-                borderRadius: BorderRadius.circular(18),
-                onTap: () => onFolderTap(folder),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: folder.color.withOpacity(count == 0 ? 0.55 : 0.95),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: const Color(0xFFD7B46A).withOpacity(0.85),
-                      width: 1.2,
+        Expanded(
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: GridView.builder(
+              padding: const EdgeInsets.fromLTRB(
+                12,
+                0,
+                12,
+                12,
+              ),
+              keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior.onDrag,
+              itemCount: folders.length,
+              gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 1.18,
+              ),
+              itemBuilder: (context, index) {
+                final folder = folders[index];
+
+                final count = tarany
+                    .where(
+                      (item) => item.letter == folder.letter,
+                    )
+                    .length;
+
+                return InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: () => onFolderTap(folder),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: folder.color.withOpacity(
+                        count == 0 ? 0.55 : 0.95,
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: const Color(0xFFD7B46A)
+                            .withOpacity(0.85),
+                        width: 1.2,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                          color: Colors.black26,
+                        ),
+                      ],
                     ),
-                    boxShadow: const [
-                      BoxShadow(
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                        color: Colors.black26,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        count == 0
-                            ? Icons.folder_open_rounded
-                            : Icons.library_music_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        folder.title,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
+                    child: Column(
+                      mainAxisAlignment:
+                          MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          count == 0
+                              ? Icons.folder_open_rounded
+                              : Icons.library_music_rounded,
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                          size: 28,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        count == 0 ? 'خالي' : '$count ترانې',
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 11,
+                        const SizedBox(height: 8),
+                        Text(
+                          folder.title,
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          count == 0
+                              ? 'خالي'
+                              : '$count ترانې',
+                          textDirection: TextDirection.rtl,
+                          style: TextStyle(
+                            color:
+                                Colors.white.withOpacity(0.9),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ],
@@ -759,241 +779,4 @@ class _FoldersGrid extends StatelessWidget {
   }
 }
 
-class _TaranyList extends StatelessWidget {
-  const _TaranyList({
-    required this.items,
-    required this.emptyText,
-    required this.onPlay,
-    required this.refresh,
-  });
-
-  final List<Tarana> items;
-  final String emptyText;
-  final Future<void> Function(Tarana item) onPlay;
-  final VoidCallback refresh;
-
-  @override
-  Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return Center(
-        child: Text(
-          emptyText,
-          textDirection: TextDirection.rtl,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      );
-    }
-
-    return ListView.separated(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-      itemCount: items.length,
-      separatorBuilder: (_, __) {
-        return const SizedBox(height: 6);
-      },
-      itemBuilder: (context, i) {
-        final item = items[i];
-        final index = tarany.indexOf(item);
-        final active = AudioController.currentIndex == index;
-
-        return Card(
-          color: Colors.white.withOpacity(0.92),
-          elevation: active ? 4 : 1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 4,
-            ),
-            leading: CircleAvatar(
-              backgroundColor: active
-                  ? const Color(0xFF0B4A3A)
-                  : const Color(0xFFE2ECE8),
-              foregroundColor: active ? Colors.white : Colors.black87,
-              child: Text('${index + 1}'),
-            ),
-            title: Text(
-              item.title,
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                fontWeight: active ? FontWeight.bold : FontWeight.w500,
-              ),
-            ),
-            subtitle: const Text(
-              'آنلاین آډیو',
-              textDirection: TextDirection.rtl,
-            ),
-            trailing: active && AudioController.loading
-                ? const SizedBox(
-                    width: 26,
-                    height: 26,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  )
-                : StreamBuilder<bool>(
-                    stream: AudioController.player.playingStream,
-                    builder: (context, snapshot) {
-                      final playing = active && (snapshot.data ?? false);
-
-                      return IconButton(
-                        onPressed: () async {
-                          await onPlay(item);
-                          refresh();
-                        },
-                        icon: Icon(
-                          playing
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                        ),
-                        color: const Color(0xFF0B4A3A),
-                        iconSize: 38,
-                      );
-                    },
-                  ),
-            onTap: () async {
-              await onPlay(item);
-              refresh();
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _BottomPlayer extends StatelessWidget {
-  const _BottomPlayer({
-    required this.formatDuration,
-    required this.refresh,
-  });
-
-  final String Function(Duration value) formatDuration;
-  final VoidCallback refresh;
-
-  @override
-  Widget build(BuildContext context) {
-    if (AudioController.currentIndex == null) {
-      return const SizedBox.shrink();
-    }
-
-    return StreamBuilder<Duration>(
-      stream: AudioController.player.positionStream,
-      builder: (context, posSnap) {
-        final position = posSnap.data ?? Duration.zero;
-        final duration = AudioController.player.duration ?? Duration.zero;
-
-        final maxMs =
-            duration.inMilliseconds > 0 ? duration.inMilliseconds.toDouble() : 1.0;
-
-        final value =
-            position.inMilliseconds.clamp(0, maxMs.toInt()).toDouble();
-
-        return Material(
-          elevation: 12,
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  tarany[AudioController.currentIndex!].title,
-                  textDirection: TextDirection.rtl,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Slider(
-                  min: 0,
-                  max: maxMs,
-                  value: value,
-                  onChanged: duration.inMilliseconds <= 0
-                      ? null
-                      : (v) {
-                          AudioController.player.seek(
-                            Duration(milliseconds: v.round()),
-                          );
-                        },
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(formatDuration(position)),
-                    Text(formatDuration(duration)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: Container(
-        width: 82,
-        padding: const EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 4,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.96),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 6,
-              offset: Offset(0, 3),
-              color: Colors.black12,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: color,
-              size: 22,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+clas
