@@ -1,3 +1,4 @@
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -375,20 +376,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  String _formatDuration(Duration value) {
-    final minutes = value.inMinutes
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-
-    final seconds = value.inSeconds
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-
-    return '$minutes:$seconds';
-  }
-
   Future<bool> _onWillPop() async {
     if (_searchFocusNode.hasFocus) {
       _searchFocusNode.unfocus();
@@ -479,7 +466,6 @@ class _HomePageState extends State<HomePage> {
                           fit: BoxFit.contain,
                         ),
                       ),
-
                       Container(
                         width: double.infinity,
                         margin: const EdgeInsets.fromLTRB(
@@ -543,9 +529,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(width: 12),
-
                             const Expanded(
                               child: Text(
                                 'ترتیب کوونکی: مولوي جلال‌الدین حقاني',
@@ -602,9 +586,7 @@ class _HomePageState extends State<HomePage> {
                               color: Color(0xFF0B4A3A),
                             ),
                           ),
-
                           const SizedBox(height: 10),
-
                           Row(
                             mainAxisAlignment:
                                 MainAxisAlignment.spaceEvenly,
@@ -706,8 +688,6 @@ class _HomePageState extends State<HomePage> {
                                 builder: (_) => FolderPage(
                                   folder: folder,
                                   onPlay: _play,
-                                  formatDuration:
-                                      _formatDuration,
                                 ),
                               ),
                             ).then((_) {
@@ -715,10 +695,6 @@ class _HomePageState extends State<HomePage> {
                             });
                           },
                         ),
-                ),
-
-                _BottomPlayer(
-                  formatDuration: _formatDuration,
                 ),
               ],
             ),
@@ -734,12 +710,10 @@ class FolderPage extends StatefulWidget {
     super.key,
     required this.folder,
     required this.onPlay,
-    required this.formatDuration,
   });
 
   final LetterFolder folder;
   final Future<void> Function(Tarana item) onPlay;
-  final String Function(Duration value) formatDuration;
 
   @override
   State<FolderPage> createState() => _FolderPageState();
@@ -809,7 +783,6 @@ class _FolderPageState extends State<FolderPage> {
                         Navigator.pop(context);
                       },
                     ),
-
                     Expanded(
                       child: Text(
                         widget.folder.title,
@@ -822,7 +795,6 @@ class _FolderPageState extends State<FolderPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 48),
                   ],
                 ),
@@ -848,9 +820,7 @@ class _FolderPageState extends State<FolderPage> {
                       Icons.library_music_rounded,
                       color: Color(0xFF0B4A3A),
                     ),
-
                     const SizedBox(width: 8),
-
                     Text(
                       count == 0
                           ? 'دا فولډر اوس خالي دی'
@@ -921,10 +891,6 @@ class _FolderPageState extends State<FolderPage> {
                   },
                 ),
               ),
-
-              _BottomPlayer(
-                formatDuration: widget.formatDuration,
-              ),
             ],
           ),
         ),
@@ -962,7 +928,6 @@ class _FoldersGrid extends StatelessWidget {
             ),
           ),
         ),
-
         Expanded(
           child: Directionality(
             textDirection: TextDirection.rtl,
@@ -1030,9 +995,7 @@ class _FoldersGrid extends StatelessWidget {
                           color: Colors.white,
                           size: 28,
                         ),
-
                         const SizedBox(height: 8),
-
                         Text(
                           folder.title,
                           textDirection:
@@ -1045,9 +1008,7 @@ class _FoldersGrid extends StatelessWidget {
                             fontSize: 13,
                           ),
                         ),
-
                         const SizedBox(height: 4),
-
                         Text(
                           count == 0
                               ? 'خالي'
@@ -1086,6 +1047,89 @@ class _TaranyList extends StatelessWidget {
   final Future<void> Function(Tarana item) onPlay;
   final VoidCallback refresh;
 
+  String _formatDuration(Duration value) {
+    final minutes = value.inMinutes
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+
+    final seconds = value.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+
+    return '$minutes:$seconds';
+  }
+
+  String _downloadFileName(int index) {
+    final number = (index + 1)
+        .toString()
+        .padLeft(2, '0');
+
+    return 'azizi_tarana_$number.mp3';
+  }
+
+  Future<void> _downloadTarana(
+    BuildContext context,
+    Tarana item,
+    int index,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    messenger.hideCurrentSnackBar();
+
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text(
+          'ډاونلوډ پیلېږي...',
+          textDirection: TextDirection.rtl,
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    try {
+      await FileSaver.instance.downloadLink(
+        link: LinkDetails(
+          link: item.url,
+        ),
+        name: _downloadFileName(index),
+      );
+
+      if (!context.mounted) {
+        return;
+      }
+
+      messenger.hideCurrentSnackBar();
+
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'ډاونلوډ شروع شو',
+            textDirection: TextDirection.rtl,
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) {
+        return;
+      }
+
+      messenger.hideCurrentSnackBar();
+
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'ډاونلوډ ناکام شو: $e',
+            textDirection: TextDirection.rtl,
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
@@ -1113,65 +1157,118 @@ class _TaranyList extends StatelessWidget {
       ),
       itemCount: items.length,
       separatorBuilder: (_, __) {
-        return const SizedBox(height: 6);
+        return const SizedBox(height: 7);
       },
       itemBuilder: (context, i) {
         final item = items[i];
         final index = tarany.indexOf(item);
+
         final active =
             AudioController.currentIndex == index;
 
         return Card(
-          color: Colors.white.withOpacity(0.92),
-          elevation: active ? 4 : 1,
+          color: Colors.white.withOpacity(0.95),
+          elevation: active ? 6 : 2,
+          clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: active
+                  ? const Color(0xFFD7B46A)
+                  : Colors.transparent,
+              width: active ? 1.5 : 0,
+            ),
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 4,
-            ),
-            leading: CircleAvatar(
-              backgroundColor: active
-                  ? const Color(0xFF0B4A3A)
-                  : const Color(0xFFE2ECE8),
-              foregroundColor:
-                  active ? Colors.white : Colors.black87,
-              child: Text('${index + 1}'),
-            ),
-            title: Text(
-              item.title,
-              textDirection: TextDirection.rtl,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontWeight: active
-                    ? FontWeight.bold
-                    : FontWeight.w500,
-              ),
-            ),
-            subtitle: const Text(
-              'آنلاین آډیو',
-              textDirection: TextDirection.rtl,
-              textAlign: TextAlign.right,
-            ),
-            trailing:
-                active && AudioController.loading
-                    ? const SizedBox(
-                        width: 26,
-                        height: 26,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                leading: CircleAvatar(
+                  backgroundColor: active
+                      ? const Color(0xFF0B4A3A)
+                      : const Color(0xFFE2ECE8),
+                  foregroundColor: active
+                      ? Colors.white
+                      : Colors.black87,
+                  child: Text('${index + 1}'),
+                ),
+                title: Text(
+                  item.title,
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontWeight: active
+                        ? FontWeight.bold
+                        : FontWeight.w500,
+                    color: const Color(0xFF082C22),
+                  ),
+                ),
+                subtitle: Text(
+                  active
+                      ? 'اوس غږېږي'
+                      : 'آنلاین آډیو',
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: active
+                        ? const Color(0xFF167256)
+                        : Colors.black54,
+                    fontWeight: active
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: 'ډاونلوډ',
+                      onPressed: () {
+                        _downloadTarana(
+                          context,
+                          item,
+                          index,
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.download_rounded,
+                      ),
+                      color: const Color(0xFFB08025),
+                      iconSize: 28,
+                    ),
+                    if (active &&
+                        AudioController.loading)
+                      const SizedBox(
+                        width: 38,
+                        height: 38,
+                        child: Padding(
+                          padding: EdgeInsets.all(7),
+                          child:
+                              CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                          ),
                         ),
                       )
-                    : StreamBuilder<bool>(
+                    else
+                      StreamBuilder<bool>(
                         stream: AudioController
                             .player.playingStream,
-                        builder: (context, snapshot) {
+                        builder: (
+                          context,
+                          snapshot,
+                        ) {
                           final playing = active &&
                               (snapshot.data ?? false);
 
                           return IconButton(
+                            tooltip: playing
+                                ? 'ودرول'
+                                : 'چلول',
                             onPressed: () async {
                               await onPlay(item);
                               refresh();
@@ -1185,113 +1282,155 @@ class _TaranyList extends StatelessWidget {
                             ),
                             color:
                                 const Color(0xFF0B4A3A),
-                            iconSize: 38,
+                            iconSize: 40,
                           );
                         },
                       ),
-            onTap: () async {
-              await onPlay(item);
-              refresh();
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _BottomPlayer extends StatelessWidget {
-  const _BottomPlayer({
-    required this.formatDuration,
-  });
-
-  final String Function(Duration value) formatDuration;
-
-  @override
-  Widget build(BuildContext context) {
-    if (AudioController.currentIndex == null) {
-      return const SizedBox.shrink();
-    }
-
-    return StreamBuilder<Duration>(
-      stream: AudioController.player.positionStream,
-      builder: (context, posSnap) {
-        final position =
-            posSnap.data ?? Duration.zero;
-
-        final duration =
-            AudioController.player.duration ??
-                Duration.zero;
-
-        final maxMs = duration.inMilliseconds > 0
-            ? duration.inMilliseconds.toDouble()
-            : 1.0;
-
-        final value = position.inMilliseconds
-            .clamp(
-              0,
-              maxMs.toInt(),
-            )
-            .toDouble();
-
-        return Material(
-          elevation: 12,
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              14,
-              8,
-              14,
-              10,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  tarany[
-                          AudioController.currentIndex!]
-                      .title,
-                  textDirection: TextDirection.rtl,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                Slider(
-                  min: 0,
-                  max: maxMs,
-                  value: value,
-                  onChanged:
-                      duration.inMilliseconds <= 0
-                          ? null
-                          : (v) {
-                              AudioController.player
-                                  .seek(
-                                Duration(
-                                  milliseconds:
-                                      v.round(),
-                                ),
-                              );
-                            },
-                ),
-
-                Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      formatDuration(position),
-                    ),
-                    Text(
-                      formatDuration(duration),
-                    ),
                   ],
                 ),
-              ],
-            ),
+                onTap: () async {
+                  await onPlay(item);
+                  refresh();
+                },
+              ),
+
+              if (active)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(
+                    12,
+                    2,
+                    12,
+                    10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F6F3),
+                    border: Border(
+                      top: BorderSide(
+                        color: const Color(0xFFD7B46A)
+                            .withOpacity(0.45),
+                      ),
+                    ),
+                  ),
+                  child: StreamBuilder<Duration?>(
+                    stream: AudioController
+                        .player.durationStream,
+                    builder: (
+                      context,
+                      durationSnapshot,
+                    ) {
+                      final duration =
+                          durationSnapshot.data ??
+                              AudioController
+                                  .player.duration ??
+                              Duration.zero;
+
+                      return StreamBuilder<Duration>(
+                        stream: AudioController
+                            .player.positionStream,
+                        builder: (
+                          context,
+                          positionSnapshot,
+                        ) {
+                          final position =
+                              positionSnapshot.data ??
+                                  Duration.zero;
+
+                          final maxMilliseconds =
+                              duration.inMilliseconds > 0
+                                  ? duration
+                                      .inMilliseconds
+                                      .toDouble()
+                                  : 1.0;
+
+                          final sliderValue = position
+                              .inMilliseconds
+                              .clamp(
+                                0,
+                                maxMilliseconds.toInt(),
+                              )
+                              .toDouble();
+
+                          return Column(
+                            mainAxisSize:
+                                MainAxisSize.min,
+                            children: [
+                              Slider(
+                                min: 0,
+                                max: maxMilliseconds,
+                                value: sliderValue,
+                                activeColor:
+                                    const Color(
+                                  0xFF0B4A3A,
+                                ),
+                                inactiveColor:
+                                    const Color(
+                                  0xFFC9D8D2,
+                                ),
+                                onChanged:
+                                    duration.inMilliseconds <=
+                                            0
+                                        ? null
+                                        : (value) {
+                                            AudioController
+                                                .player
+                                                .seek(
+                                              Duration(
+                                                milliseconds:
+                                                    value
+                                                        .round(),
+                                              ),
+                                            );
+                                          },
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets
+                                        .symmetric(
+                                  horizontal: 8,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .spaceBetween,
+                                  children: [
+                                    Text(
+                                      _formatDuration(
+                                        position,
+                                      ),
+                                      style:
+                                          const TextStyle(
+                                        color: Color(
+                                          0xFF0B4A3A,
+                                        ),
+                                        fontWeight:
+                                            FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      _formatDuration(
+                                        duration,
+                                      ),
+                                      style:
+                                          const TextStyle(
+                                        color: Color(
+                                          0xFF0B4A3A,
+                                        ),
+                                        fontWeight:
+                                            FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+            ],
           ),
         );
       },
@@ -1342,9 +1481,7 @@ class _SocialButton extends StatelessWidget {
               color: color,
               size: 22,
             ),
-
             const SizedBox(height: 4),
-
             Text(
               label,
               maxLines: 1,
@@ -1360,3 +1497,5 @@ class _SocialButton extends StatelessWidget {
     );
   }
 }
+
+            
