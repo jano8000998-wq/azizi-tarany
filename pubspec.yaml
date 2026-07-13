@@ -24,6 +24,7 @@ flutter:
 
   assets:
     - assets/images/cover.png
+    - assets/images/profile.jpg
 
 flutter_launcher_icons:
   android: true
