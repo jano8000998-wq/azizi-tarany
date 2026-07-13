@@ -451,31 +451,118 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 if (!keyboardOpen)
-                  Container(
-                    width: double.infinity,
-                    height: 210,
-                    margin: const EdgeInsets.fromLTRB(
-                      12,
-                      12,
-                      12,
-                      6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0B4A3A),
-                      borderRadius: BorderRadius.circular(22),
-                      boxShadow: const [
-                        BoxShadow(
-                          blurRadius: 12,
-                          offset: Offset(0, 5),
-                          color: Colors.black26,
+                  Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 210,
+                        margin: const EdgeInsets.fromLTRB(
+                          12,
+                          12,
+                          12,
+                          6,
                         ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.asset(
-                      'assets/images/cover.png',
-                      fit: BoxFit.contain,
-                    ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0B4A3A),
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: const [
+                            BoxShadow(
+                              blurRadius: 12,
+                              offset: Offset(0, 5),
+                              color: Colors.black26,
+                            ),
+                          ],
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Image.asset(
+                          'assets/images/cover.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.fromLTRB(
+                          14,
+                          2,
+                          14,
+                          6,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0B4A3A),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFD7B46A),
+                            width: 1.2,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                              color: Colors.black26,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            Container(
+                              width: 52,
+                              height: 52,
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFD7B46A),
+                                  width: 2,
+                                ),
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/profile.jpg',
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.topCenter,
+                                  errorBuilder: (
+                                    context,
+                                    error,
+                                    stackTrace,
+                                  ) {
+                                    return const ColoredBox(
+                                      color: Color(0xFF12624D),
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            const Expanded(
+                              child: Text(
+                                'ترتیب کوونکی: مولوي جلال‌الدین حقاني',
+                                textDirection: TextDirection.rtl,
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
 
                 if (!keyboardOpen)
@@ -515,7 +602,9 @@ class _HomePageState extends State<HomePage> {
                               color: Color(0xFF0B4A3A),
                             ),
                           ),
+
                           const SizedBox(height: 10),
+
                           Row(
                             mainAxisAlignment:
                                 MainAxisAlignment.spaceEvenly,
@@ -630,9 +719,6 @@ class _HomePageState extends State<HomePage> {
 
                 _BottomPlayer(
                   formatDuration: _formatDuration,
-                  refresh: () {
-                    setState(() {});
-                  },
                 ),
               ],
             ),
@@ -680,11 +766,6 @@ class _FolderPageState extends State<FolderPage> {
     }).toList();
   }
 
-  Future<bool> _onWillPop() async {
-    Navigator.pop(context);
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
     final count = tarany
@@ -693,160 +774,158 @@ class _FolderPageState extends State<FolderPage> {
         )
         .length;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF0B3D2E),
-                Color(0xFF145A46),
-                Color(0xFF081F19),
-              ],
-            ),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF0B3D2E),
+              Color(0xFF145A46),
+              Color(0xFF081F19),
+            ],
           ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    10,
-                    10,
-                    10,
-                    8,
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Expanded(
-                        child: Text(
-                          widget.folder.title,
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 48),
-                    ],
-                  ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  10,
+                  10,
+                  10,
+                  8,
                 ),
-
-                Container(
-                  margin: const EdgeInsets.fromLTRB(
-                    14,
-                    0,
-                    14,
-                    8,
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.92),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.library_music_rounded,
-                        color: Color(0xFF0B4A3A),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        count == 0
-                            ? 'دا فولډر اوس خالي دی'
-                            : 'په دې فولډر کې $count ترانې شته',
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+
+                    Expanded(
+                      child: Text(
+                        widget.folder.title,
                         textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFF0B4A3A),
+                          color: Colors.white,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    14,
-                    4,
-                    14,
-                    8,
-                  ),
-                  child: TextField(
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
-                    onChanged: (value) {
-                      setState(() {
-                        _query = value;
-                      });
-                    },
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
                     ),
-                    decoration: InputDecoration(
-                      hintText:
-                          'په دې فولډر کې ترانه ولټوئ...',
-                      hintTextDirection: TextDirection.rtl,
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _query.isEmpty
-                          ? null
-                          : IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () {
-                                setState(() {
-                                  _query = '';
-                                });
-                              },
-                            ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(18),
-                        borderSide: BorderSide.none,
+
+                    const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+
+              Container(
+                margin: const EdgeInsets.fromLTRB(
+                  14,
+                  0,
+                  14,
+                  8,
+                ),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.92),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.library_music_rounded,
+                      color: Color(0xFF0B4A3A),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    Text(
+                      count == 0
+                          ? 'دا فولډر اوس خالي دی'
+                          : 'په دې فولډر کې $count ترانې شته',
+                      textDirection: TextDirection.rtl,
+                      style: const TextStyle(
+                        color: Color(0xFF0B4A3A),
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  14,
+                  4,
+                  14,
+                  8,
+                ),
+                child: TextField(
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  onChanged: (value) {
+                    setState(() {
+                      _query = value;
+                    });
+                  },
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                  decoration: InputDecoration(
+                    hintText:
+                        'په دې فولډر کې ترانه ولټوئ...',
+                    hintTextDirection: TextDirection.rtl,
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              setState(() {
+                                _query = '';
+                              });
+                            },
+                          ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
+              ),
 
-                Expanded(
-                  child: _TaranyList(
-                    items: _items,
-                    emptyText: count == 0
-                        ? 'دا فولډر اوس خالي دی'
-                        : 'کومه ترانه ونه موندل شوه',
-                    onPlay: widget.onPlay,
-                    refresh: () {
-                      setState(() {});
-                    },
-                  ),
-                ),
-
-                _BottomPlayer(
-                  formatDuration: widget.formatDuration,
+              Expanded(
+                child: _TaranyList(
+                  items: _items,
+                  emptyText: count == 0
+                      ? 'دا فولډر اوس خالي دی'
+                      : 'کومه ترانه ونه موندل شوه',
+                  onPlay: widget.onPlay,
                   refresh: () {
                     setState(() {});
                   },
                 ),
-              ],
-            ),
+              ),
+
+              _BottomPlayer(
+                formatDuration: widget.formatDuration,
+              ),
+            ],
           ),
         ),
       ),
@@ -951,7 +1030,9 @@ class _FoldersGrid extends StatelessWidget {
                           color: Colors.white,
                           size: 28,
                         ),
+
                         const SizedBox(height: 8),
+
                         Text(
                           folder.title,
                           textDirection:
@@ -964,7 +1045,9 @@ class _FoldersGrid extends StatelessWidget {
                             fontSize: 13,
                           ),
                         ),
+
                         const SizedBox(height: 4),
+
                         Text(
                           count == 0
                               ? 'خالي'
@@ -1120,11 +1203,9 @@ class _TaranyList extends StatelessWidget {
 class _BottomPlayer extends StatelessWidget {
   const _BottomPlayer({
     required this.formatDuration,
-    required this.refresh,
   });
 
   final String Function(Duration value) formatDuration;
-  final VoidCallback refresh;
 
   @override
   Widget build(BuildContext context) {
@@ -1178,6 +1259,7 @@ class _BottomPlayer extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 Slider(
                   min: 0,
                   max: maxMs,
@@ -1195,6 +1277,7 @@ class _BottomPlayer extends StatelessWidget {
                               );
                             },
                 ),
+
                 Row(
                   mainAxisAlignment:
                       MainAxisAlignment.spaceBetween,
@@ -1259,7 +1342,9 @@ class _SocialButton extends StatelessWidget {
               color: color,
               size: 22,
             ),
+
             const SizedBox(height: 4),
+
             Text(
               label,
               maxLines: 1,
